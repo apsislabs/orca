@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-class Wrapplication {
+class Wraptor {
     constructor({callbacks = {}, globalKey = '*', entryKey = '_wr_cbs'} = {}) {
         this._callbacks = callbacks;
         this._globalKey = globalKey;
@@ -28,7 +28,7 @@ class Wrapplication {
 
     run(namespaces, runDefaults = true) {
         if ( !_.isArray(namespaces) ) { namespaces = [namespaces]; }
-        if ( runDefaults ) { namespaces.push(this._globalKey); }
+        if ( runDefaults ) { namespaces.unshift(this._globalKey); }
 
         _.each(namespaces, (n) => {
             this._runNamespace(n);
@@ -68,14 +68,4 @@ function getValuesDeep(haystack, needle) {
     return results;
 }
 
-// TESTING
-let wrap = new Wrapplication();
-
-wrap.registerAction('inbox._wr_cbs', () => { console.log("test inbox 1"); }, 1);
-wrap.registerAction('inbox.show', () => { console.log("test 5"); }, 5);
-wrap.registerAction('inbox.show', () => { console.log("test 0"); }, 0);
-wrap.registerAction('inbox.show', () => { console.log("test 25"); }, 25);
-wrap.registerAction('inbox.show', () => { console.log("test 25 2"); }, 25);
-wrap.registerAction('inbox.show.nested', () => { console.log("test nested 0"); });
-
-wrap.run('inbox');
+export default Wraptor;

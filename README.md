@@ -1,2 +1,2 @@
-# wrapplication
-An application wrapper for real-world javascript separation.
+# Wraptor
+A code wrapper for real-world javascript separation.

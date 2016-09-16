@@ -30,11 +30,11 @@ In a perfect world, you'd have a small, perfect javascript bundle, built of magi
 But we know that's not the world you live in. If you're working on anything like any of the web apps we've seen over the past 5 years, you've got some frankenstein monster that's half legacy jQuery and half "I learned this in a weekend" Angular --- and worse, you've probably got something like this:
 
 ```js
-    if ($('body').hasClass('special-page')) {
-        // execute code that only works on this page here.
-        // Don't execute it anywhere else or everything
-        // will break.
-    }
+if ($('body').hasClass('special-page')) {
+    // execute code that only works on this page here.
+    // Don't execute it anywhere else or everything
+    // will break.
+}
 ```
 
 If that looks familiar, then `wraptor` is for you.
@@ -74,7 +74,16 @@ wrap.run('foo'); // => log All, Foo
 Our system of namespaces allow you to run code in a very structured way.
 
 ```js
-wrap.registerAction('*'); // default global
-wrap.registerAction('foo');
-wrap.registerAction('bar');
+wrap.registerAction('*');       // default global namespace
+wrap.registerAction('foo');     // foo namespace
+wrap.registerAction('bar');     // bar namespace
 ```
+
+Calling `run` with a namespace will run only the actions in that namespace. Namespaces can be nested, too:
+
+```js
+wrap.registerAction('foo.bar');
+wrap.registerAction('foo.baz');
+```
+
+You can run either of these namespaces individually, or together by calling `wrap.run('foo')`, which will run all nested namespaces.

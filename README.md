@@ -6,19 +6,21 @@ A code wrapper for real-world javascript separation.
 
 Install from `npm`:
 
-    npm install --save wraptor
+`npm install --save wraptor`
 
 Set up a singleton for your application wrapper:
 
-    import Wraptor from 'wraptor';
-    export default let wrap = new Wraptor();
+```js
+import Wraptor from 'wraptor';
+export default let wrap = new Wraptor();
+```
 
 Import that wrapper for use throughout your application:
 
 ```js
-    import wrap from 'wrap.js';
-    wrap.registerAction('*', () => { console.log("test"); });
-    wrap.run();
+import wrap from 'wrap.js';
+wrap.registerAction('*', () => { console.log("test"); });
+wrap.run();
 ```
 
 ## What the hell does that mean

@@ -32,7 +32,7 @@ class Wraptor {
 
         _.each(namespaces, (n) => {
             this._runNamespace(n);
-        }
+        });
     }
 
     _runNamespaces(namespace) {

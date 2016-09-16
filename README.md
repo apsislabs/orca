@@ -74,16 +74,27 @@ wrap.run('foo'); // => log All, Foo
 Our system of namespaces allow you to run code in a very structured way.
 
 ```js
-wrap.registerAction('*');       // default global namespace
-wrap.registerAction('foo');     // foo namespace
-wrap.registerAction('bar');     // bar namespace
+wrap.registerAction('*', globalAction);    // default global namespace
+wrap.registerAction('foo', fooAction);     // foo namespace
+wrap.registerAction('bar', barAction);     // bar namespace
+
+wrap.run('foo');                // runs globals and actions in foo namespace
 ```
 
 Calling `run` with a namespace will run only the actions in that namespace. Namespaces can be nested, too:
 
 ```js
-wrap.registerAction('foo.bar');
-wrap.registerAction('foo.baz');
+wrap.registerAction('foo.bar', fooBarAction);
+wrap.registerAction('foo.baz', fooBazAction);
+
+wrap.run('foo'); // run actions in both foo.bar and foo.baz
 ```
 
-You can run either of these namespaces individually, or together by calling `wrap.run('foo')`, which will run all nested namespaces.
+## Priority
+
+Sometimes sequencing can be important when executing discrete blocks of code. There's an optional third parameter which can be passed to `registerAction`, which will set the priority. Actions will be run in priority order from high to low.
+
+```js
+wrap.registerAction('*', foo, 0);
+wrap.registerAction('*', bar, 5);   // this will run before foo
+```

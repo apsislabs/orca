@@ -6,7 +6,9 @@ A code wrapper for real-world javascript separation.
 
 Install from `npm`:
 
-`npm install --save wraptor`
+```
+npm install --save wraptor
+```
 
 Set up a singleton for your application wrapper:
 

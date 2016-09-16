@@ -22,7 +22,7 @@ Import that wrapper for use throughout your application:
 ```js
 import wrap from 'wrap.js';
 wrap.registerAction('*', () => { console.log("test"); });
-wrap.run();
+wrap.run(); // => test
 ```
 
 ## What the hell does that mean
@@ -36,6 +36,10 @@ if ($('body').hasClass('special-page')) {
     // execute code that only works on this page here.
     // Don't execute it anywhere else or everything
     // will break.
+}
+
+if ( $('#special-div').length > 0 ) {
+    // this will break if #special-div is not present
 }
 ```
 
@@ -80,7 +84,7 @@ wrap.registerAction('*', globalAction);    // default global namespace
 wrap.registerAction('foo', fooAction);     // foo namespace
 wrap.registerAction('bar', barAction);     // bar namespace
 
-wrap.run('foo');                // runs globals and actions in foo namespace
+wrap.run('foo');    // runs globals and actions in foo namespace
 ```
 
 Calling `run` with a namespace will run only the actions in that namespace. Namespaces can be nested, too:
@@ -89,7 +93,7 @@ Calling `run` with a namespace will run only the actions in that namespace. Name
 wrap.registerAction('foo.bar', fooBarAction);
 wrap.registerAction('foo.baz', fooBazAction);
 
-wrap.run('foo'); // run actions in both foo.bar and foo.baz
+wrap.run('foo');    // run actions in both foo.bar and foo.baz
 ```
 
 ## Priority

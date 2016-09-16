@@ -26,7 +26,7 @@ class Wraptor {
         this.registerAction(this._globalKey, callback, priority);
     }
 
-    run(namespaces, runDefaults = true) {
+    run(namespaces = [], runDefaults = true) {
         if ( !_.isArray(namespaces) ) { namespaces = [namespaces]; }
         if ( runDefaults ) { namespaces.unshift(this._globalKey); }
 

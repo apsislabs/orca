@@ -1,4 +1,4 @@
-# wraptor
+# orca
 
 A code wrapper for real-world javascript separation.
 
@@ -7,22 +7,15 @@ A code wrapper for real-world javascript separation.
 Install from `npm`:
 
 ```
-npm install --save wraptor
-```
-
-Set up a singleton for your application wrapper:
-
-```js
-import Wraptor from 'wraptor';
-export default let wrap = new Wraptor();
+npm install --save orcajs
 ```
 
 Import that wrapper for use throughout your application:
 
 ```js
-import wrap from 'wrap.js';
-wrap.registerAction('*', () => { console.log("test"); });
-wrap.run(); // => test
+import app from 'orcajs';
+app.registerAction('*', () => { console.log("test"); });
+app.run(); // => test
 ```
 
 ## What the hell does that mean
@@ -43,16 +36,14 @@ if ( $('#special-div').length > 0 ) {
 }
 ```
 
-If that looks familiar, then `wraptor` is for you.
+If that looks familiar, then `orca` is for you.
 
 ## What it does
 
-`Wraptor` lets you set up ordered an ordered system of callbacks for dividing your code into discretely executing chunks. This lets you bundle all your code into a single JS file, but limit your `react` component just to the pages they're used on.
+`orca` lets you set up ordered an ordered system of callbacks for dividing your code into discretely executing chunks. This lets you bundle all your code into a single JS file, but limit your `react` component just to the pages they're used on.
 
 ```js
-import Wraptor from 'wraptor';
-
-let wrap = new Wrapter();
+import app from 'orcajs';
 
 // Run on all pages
 function all() {
@@ -69,10 +60,10 @@ function bar() {
     console.log("Bar");
 }
 
-wrap.registerAction('foo', foo);
-wrap.registerAction('bar', bar);
+app.registerAction('foo', foo);
+app.registerAction('bar', bar);
 
-wrap.run('foo'); // => log All, Foo
+app.run('foo'); // => log All, Foo
 ```
 
 ## Namespacing
@@ -80,20 +71,20 @@ wrap.run('foo'); // => log All, Foo
 Our system of namespaces allow you to run code in a very structured way.
 
 ```js
-wrap.registerAction('*', globalAction);    // default global namespace
-wrap.registerAction('foo', fooAction);     // foo namespace
-wrap.registerAction('bar', barAction);     // bar namespace
+app.registerAction('*', globalAction);    // default global namespace
+app.registerAction('foo', fooAction);     // foo namespace
+app.registerAction('bar', barAction);     // bar namespace
 
-wrap.run('foo');    // runs globals and actions in foo namespace
+app.run('foo');    // runs globals and actions in foo namespace
 ```
 
 Calling `run` with a namespace will run only the actions in that namespace. Namespaces can be nested, too:
 
 ```js
-wrap.registerAction('foo.bar', fooBarAction);
-wrap.registerAction('foo.baz', fooBazAction);
+app.registerAction('foo.bar', fooBarAction);
+app.registerAction('foo.baz', fooBazAction);
 
-wrap.run('foo');    // run actions in both foo.bar and foo.baz
+app.run('foo');    // run actions in both foo.bar and foo.baz
 ```
 
 ## Priority
@@ -101,6 +92,6 @@ wrap.run('foo');    // run actions in both foo.bar and foo.baz
 Sometimes sequencing can be important when executing discrete blocks of code. There's an optional third parameter which can be passed to `registerAction`, which will set the priority. Actions will be run in priority order from high to low.
 
 ```js
-wrap.registerAction('*', foo, 0);
-wrap.registerAction('*', bar, 5);   // this will run before foo
+app.registerAction('*', foo, 0);
+app.registerAction('*', bar, 5);   // this will run before foo
 ```

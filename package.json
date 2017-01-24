@@ -5,10 +5,13 @@
   "license": "MIT",
   "scripts": {
     "build": "babel src --presets babel-preset-es2015 --out-dir dist",
+    "test": "npm run build && mocha -R spec",
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "lodash": "^4.17.0"
+    "lodash": "^4.17.0",
+    "mocha": "^3.2.0",
+    "simple-mock": "^0.7.3"
   },
   "devDependencies": {
     "babel-cli": "^6.22.0",

@@ -30,9 +30,7 @@ class Wraptor {
         if ( !_.isArray(namespaces) ) { namespaces = [namespaces]; }
         if ( runDefaults ) { namespaces.unshift(this._globalKey); }
 
-        _.each(namespaces, (n) => {
-            this._runNamespace(n);
-        });
+        _.each(namespaces, (n) => { this._runNamespaces(n); });
     }
 
     _runNamespaces(namespace) {
@@ -68,4 +66,4 @@ function getValuesDeep(haystack, needle) {
     return results;
 }
 
-export default Wraptor;
+export default new Wraptor();

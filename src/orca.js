@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-class Wraptor {
+class Orca {
     constructor({callbacks = {}, globalKey = '*', entryKey = '_wr_cbs'} = {}) {
         this._callbacks = callbacks;
         this._globalKey = globalKey;
@@ -66,4 +66,4 @@ function getValuesDeep(haystack, needle) {
     return results;
 }
 
-export default new Wraptor();
+export default new Orca();

@@ -1,4 +1,4 @@
-# orca
+# orca [![Build Status](https://travis-ci.org/apsislabs/orca.svg?branch=master)](https://travis-ci.org/apsislabs/orca)
 
 A code wrapper for real-world javascript separation.
 

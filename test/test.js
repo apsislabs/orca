@@ -65,6 +65,12 @@ describe('Orca', function() {
         assert.equal(1, callbackOne.callCount);
     });
 
+    it('should skip globals when running without globals', function() {
+      app.registerGlobalAction(callbackOne);
+      app.run('foo', {runGlobals: false});
+      assert.equal(0, callbackOne.callCount);
+    });
+
     it('should not run callbacks in excluded scopes', function() {
       app.registerGlobalAction(callbackOne, {excludes: ['foo']});
 
@@ -81,6 +87,12 @@ describe('Orca', function() {
       app.run(['foo', 'bar']);
       assert.equal(1, callbackOne.callCount);
       assert.equal(1, callbackTwo.callCount);
+    });
+
+    it('should allow excludes as a string', function() {
+      app.registerGlobalAction(callbackOne, {excludes: 'foo'});
+      app.run('foo');
+      assert.equal(0, callbackOne.callCount);
     });
 
     it('should only run callbacks in namespace', function() {

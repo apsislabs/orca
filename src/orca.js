@@ -31,7 +31,7 @@ class Orca {
         this.registerAction(this._globalKey, callback, {priority: priority, excludes: excludes});
     }
 
-    run(namespaces = [], runGlobals = true) {
+    run(namespaces = [], {runGlobals = true} = {}) {
         if ( !_.isArray(namespaces) ) { namespaces = [namespaces]; }
         if ( runGlobals ) { namespaces.unshift(this._globalKey); }
 

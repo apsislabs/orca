@@ -1,13 +1,17 @@
 import _ from 'lodash';
 
 class Orca {
-    constructor({callbacks = {}, globalKey = '*', entryKey = '_wr_cbs'} = {}) {
+    constructor({callbacks = {}, globalKey = '*', entryKey = '__orca'} = {}) {
         this._callbacks = callbacks;
         this._globalKey = globalKey;
-        this._entryKey = entryKey;
+        this._entryKey  = entryKey;
     }
 
-    registerAction(namespace, callback, priority = 0) {
+	reset() {
+		this._callbacks = {};
+	}
+
+    registerAction(namespace, callback, {priority = 0, excludes = []} = {}) {
         // Defend callbacks against foolish behavior
         if ( namespace.includes(this._entryKey) ) {
             throw new Error(`Registered namespace matches reserved entryKey: ${this._entryKey}.`);
@@ -18,34 +22,34 @@ class Orca {
         // Get callbacks, return an empty object by default
         let key = `${namespace}.${this._entryKey}[${priority}]`;
         let callbacks = _.get(this._callbacks, key, []);
+        if ( !_.isArray(excludes) ) { excludes = [excludes]; }
 
-        _.set(this._callbacks, key, _.concat(callbacks, callback));
+        _.set(this._callbacks, key, _.concat(callbacks, {func: callback, excludes: excludes}));
     }
 
-    registerGlobalAction(callback, priority = 0) {
-        this.registerAction(this._globalKey, callback, priority);
+    registerGlobalAction(callback, {priority = 0, excludes = []} = {}) {
+        this.registerAction(this._globalKey, callback, {priority: priority, excludes: excludes});
     }
 
-    run(namespaces = [], runDefaults = true) {
+    run(namespaces = [], {runGlobals = true} = {}) {
         if ( !_.isArray(namespaces) ) { namespaces = [namespaces]; }
-        if ( runDefaults ) { namespaces.unshift(this._globalKey); }
+        if ( runGlobals ) { namespaces.unshift(this._globalKey); }
 
-        _.each(namespaces, (n) => { this._runNamespaces(n); });
+        let called = namespaces;
+
+        _.each(_.uniq(namespaces), (n) => { this._runNamespaces(n, called); });
     }
 
-    _runNamespaces(namespace) {
+    _runNamespaces(namespace, called) {
         let entries = _.get(this._callbacks, namespace, {});
         let namespaces = getValuesDeep(entries, this._entryKey);
 
         _.forEach(namespaces, (n) => {
             _.forEach(_.reverse(n), (priorityLevel) => {
-                _.forEach(priorityLevel, (func) => {
-                    if ( _.isFunction(func) ) {
-                        func();
-                    } else {
-                        console.warn(`Attempted to execute a callback of type: ${typeof f}`);
-                        console.warn("\t", f);
-                    }
+                _.forEach(priorityLevel, (callback) => {
+                    let {func, excludes} = callback;
+                    if (_.intersection(excludes, called).length > 0) { return false; }
+                    if ( _.isFunction(func) ) { func(); }
                 });
             });
         });
@@ -66,4 +70,5 @@ function getValuesDeep(haystack, needle) {
     return results;
 }
 
+export { Orca as Orca };
 export default new Orca();

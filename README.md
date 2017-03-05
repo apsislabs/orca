@@ -1,6 +1,6 @@
 # orca
 
-[![Build Status](https://travis-ci.org/apsislabs/orca.svg?branch=master)](https://travis-ci.org/apsislabs/orca)
+[![Build Status](https://travis-ci.org/apsislabs/orca.svg?branch=master)](https://travis-ci.org/apsislabs/orca) [![Coverage Status](https://coveralls.io/repos/github/apsislabs/orca/badge.svg?branch=feature%2Fexcludes)](https://coveralls.io/github/apsislabs/orca?branch=feature%2Fexcludes)
 
 ---
 

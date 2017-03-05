@@ -49,13 +49,7 @@ class Orca {
                 _.forEach(priorityLevel, (callback) => {
                     let {func, excludes} = callback;
                     if (_.intersection(excludes, called).length > 0) { return false; }
-
-                    if ( _.isFunction(func) ) {
-                        func();
-                    } else {
-                        console.warn(`Attempted to execute a callback of type: ${typeof func}`);
-                        console.warn("\t", func);
-                    }
+                    if ( _.isFunction(func) ) { func(); }
                 });
             });
         });

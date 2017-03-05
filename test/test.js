@@ -43,6 +43,11 @@ describe('Orca', function() {
       app.reset();
       assert.ok(_.isEmpty(app._callbacks));
     });
+
+    it('should not allow registering invalid callbacks', function() {
+      assert.throws(() => app.registerGlobalAction("not a callback"), TypeError);
+      assert.throws(() => app.registerAction(app._entryKey, callbackOne), Error);
+    });
   });
 
   describe('#run', function() {
@@ -70,6 +75,12 @@ describe('Orca', function() {
       // Does not run in foo scope
       app.run('foo');
       assert.equal(1, callbackOne.callCount);
+
+      // Does not run when passed an array of scopes
+      app.registerAction('bar', callbackTwo);
+      app.run(['foo', 'bar']);
+      assert.equal(1, callbackOne.callCount);
+      assert.equal(1, callbackTwo.callCount);
     });
 
     it('should only run callbacks in namespace', function() {

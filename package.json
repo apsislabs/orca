@@ -3,6 +3,7 @@
   "version": "1.1.0",
   "main": "./dist/orca.js",
   "license": "MIT",
+  "description": "orchestrate your javascript",
   "scripts": {
     "build": "babel src --presets babel-preset-es2015 --out-dir dist",
     "test": "npm run build && istanbul cover _mocha",

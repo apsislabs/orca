@@ -3,9 +3,7 @@ var simple = require('simple-mock');
 var _      = require('lodash');
 var orca   = require('../dist/orca.js');
 
-// Prepare Callbacks
-
-
+// Run Tests
 describe('Orca', function() {
   var app, callbacks, callbackOne, callbackTwo;
 

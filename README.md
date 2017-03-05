@@ -44,26 +44,18 @@ If that looks familiar, then `orca` is for you.
 
 ## What it does
 
-`orca` lets you set up ordered an ordered system of callbacks for dividing your code into discretely executing chunks. This lets you bundle all your code into a single JS file, but limit your `react` component just to the pages they're used on.
+`orca` lets you set up ordered an ordered system of callbacks for dividing your code into discretely executing chunks. This lets you bundle all your code into a single JS file, but limit code to just to the pages they're used on.
 
 ```js
 import app from 'orcajs';
 
-// Run on all pages
-function all() {
-    console.log("All");
-}
+// Define Callbacks
+function all() { console.log("All"); }
+function foo() { console.log("Foo"); }
+function bar() { console.log("Bar"); }
 
-// Only run on foo pages
-function foo() {
-    console.log("Foo");
-}
-
-// Only run on bar pages
-function bar() {
-    console.log("Bar");
-}
-
+// Register Actions
+app.registerGlobalAction(all);
 app.registerAction('foo', foo);
 app.registerAction('bar', bar);
 
@@ -72,23 +64,56 @@ app.run('foo'); // => log All, Foo
 
 ## Namespacing
 
-Our system of namespaces allow you to run code in a very structured way.
+Namespacing allows you to run code in a structured way. Calling `run` with a namespace will run only the actions in that namespace.
 
 ```js
-app.registerAction('*', globalAction);    // default global namespace
-app.registerAction('foo', fooAction);     // foo namespace
-app.registerAction('bar', barAction);     // bar namespace
+app.registerGlobalAction(all);   // global namespace
+app.registerAction('foo', foo);  // foo namespace
+app.registerAction('bar', bar);  // bar namespace
 
-app.run('foo');    // runs globals and actions in foo namespace
+app.run('foo');    // runs `all` and `foo`, but not `bar`
 ```
 
-Calling `run` with a namespace will run only the actions in that namespace. Namespaces can be nested, too:
+### Nesting
+
+Namespaces can be nested with the `.` character:
 
 ```js
-app.registerAction('foo.bar', fooBarAction);
-app.registerAction('foo.baz', fooBazAction);
+app.registerAction('foo.bar', fooBar);
+app.registerAction('foo.baz', fooBaz);
 
-app.run('foo');    // run actions in both foo.bar and foo.baz
+app.run('foo');     // runs `fooBar` and `fooBaz`
+app.run('foo.bar'); // runs `fooBar`, but not `fooBaz`
+```
+
+### Executing Multiple Namespaces
+
+Multiple namespaces can be run at once:
+
+```js
+app.run(['foo', 'bar']);
+```
+
+### Excluding Callbacks from Namespaces
+
+Callbacks can be excluded from specific namespaces:
+
+```js
+app.registerGlobalAction(foo, {excludes: ['bar']});
+
+app.run();          // runs `foo`
+app.run('foo');     // runs `foo`
+app.run('bar');     // does not run `foo`
+```
+
+If you'd like to run a namespace, but exclude global actions, you can pass a second argument to `run`:
+
+```js
+app.registerGlobalAction(foo);
+app.registerAction('bar', baz);
+
+app.run();                           // runs `foo`
+app.run('bar', {runGlobals: false}); // does not run `foo`
 ```
 
 ## Priority
@@ -96,6 +121,6 @@ app.run('foo');    // run actions in both foo.bar and foo.baz
 Sometimes sequencing can be important when executing discrete blocks of code. There's an optional third parameter which can be passed to `registerAction`, which will set the priority. Actions will be run in priority order from high to low.
 
 ```js
-app.registerAction('*', foo, 0);
-app.registerAction('*', bar, 5);   // this will run before foo
+app.registerGlobalAction(foo, {priority: 0});
+app.registerGlobalAction(bar, {priority: 5});   // this will run before foo
 ```

@@ -1,31 +1,42 @@
-var assert = require('assert');
-var simple = require('simple-mock');
-var _      = require('lodash');
-var orca   = require('../dist/orca.js');
+let assert = require('assert');
+let simple = require('simple-mock');
+let _      = require('lodash');
+let Orca   = require('../src/orca.js').Orca;
 
-// Run Tests
-describe('Orca', function() {
-  var app, callbacks, callbackOne, callbackTwo;
+describe('Orca', () => {
+  let app, callbackOne, callbackTwo;
 
-  before(function() {
-    app = orca.default; // reset instance on each test
+  before(() => {
+    app = new Orca();
   });
 
-  beforeEach(function() {
+  beforeEach(() => {
     app.reset();
-    callbacks   = [];
-    callbackOne = simple.spy(function() {});
-    callbackTwo = simple.spy(function() {});
+    callbackOne = simple.spy(() => {});
+    callbackTwo = simple.spy(() => {});
   });
 
-  describe('#registerAction', function() {
-    it('should register actions', function() {
+  // Constructor Tests
+  // ======================================================
+  describe('#constructor', () => {
+    it('should instantiate with custom args', () => {
+      let app2 = new Orca({globalKey: '**', entryKey: '__custom'});
+
+  	  assert.equal('**', app2._globalKey);
+  	  assert.equal('__custom', app2._entryKey);
+    });
+  });
+
+  // Registration Tests
+  // ======================================================
+  describe('#registerAction', () => {
+    it('should register actions', () => {
       app.registerGlobalAction(callbackOne);
       callbacks = _.flattenDeep(app._callbacks[app._globalKey][app._entryKey]);
       assert.ok(_.some(callbacks, ['func', callbackOne]));
     });
 
-    it('should register actions with priority', function() {
+    it('should register actions with priority', () => {
       app.registerGlobalAction(callbackOne, {priority: 99});
       app.registerGlobalAction(callbackTwo, {priority: 100});
 
@@ -35,7 +46,7 @@ describe('Orca', function() {
       assert.equal(false, _.some(callbacks, ['func', callbackTwo]));
     });
 
-    it('should reset', function() {
+    it('should reset', () => {
       app.registerGlobalAction(callbackOne);
       callbacks = _.flattenDeep(app._callbacks[app._globalKey][app._entryKey]);
       assert.ok(_.some(callbacks, ['func', callbackOne]));
@@ -44,34 +55,36 @@ describe('Orca', function() {
       assert.ok(_.isEmpty(app._callbacks));
     });
 
-    it('should not allow registering invalid callbacks', function() {
+    it('should not allow registering invalid callbacks', () => {
       assert.throws(() => app.registerGlobalAction("not a callback"), TypeError);
       assert.throws(() => app.registerAction(app._entryKey, callbackOne), Error);
     });
   });
 
-  describe('#run', function() {
-    it('should run all callbacks in the global scope', function() {
+  // Run Tests
+  // ======================================================
+  describe('#run', () => {
+    it('should run all callbacks in the global scope', () => {
       app.registerGlobalAction(callbackOne);
       app.run(app._globalKey);
 
       assert.equal(1, callbackOne.callCount);
     });
 
-    it('should only run globals once when calling global scope', function() {
+    it('should only run globals once when calling global scope', () => {
         app.registerGlobalAction(callbackOne);
         app.run();
 
         assert.equal(1, callbackOne.callCount);
     });
 
-    it('should skip globals when running without globals', function() {
+    it('should skip globals when running without globals', () => {
       app.registerGlobalAction(callbackOne);
       app.run('foo', {runGlobals: false});
       assert.equal(0, callbackOne.callCount);
     });
 
-    it('should not run callbacks in excluded scopes', function() {
+    it('should not run callbacks in excluded scopes', () => {
       app.registerGlobalAction(callbackOne, {excludes: ['foo']});
 
       // Runs in global scope
@@ -89,13 +102,13 @@ describe('Orca', function() {
       assert.equal(1, callbackTwo.callCount);
     });
 
-    it('should allow excludes as a string', function() {
+    it('should allow excludes as a string', () => {
       app.registerGlobalAction(callbackOne, {excludes: 'foo'});
       app.run('foo');
       assert.equal(0, callbackOne.callCount);
     });
 
-    it('should only run callbacks in namespace', function() {
+    it('should only run callbacks in namespace', () => {
       app.registerAction('foo', callbackOne);
       app.registerAction('bar', callbackTwo);
 
@@ -105,7 +118,7 @@ describe('Orca', function() {
       assert.equal(0, callbackTwo.callCount);
     });
 
-    it('should run all nested callbacks in namespace', function() {
+    it('should run all nested callbacks in namespace', () => {
       app.registerAction('foo', callbackOne);
       app.registerAction('foo.baz', callbackTwo);
 
@@ -115,7 +128,7 @@ describe('Orca', function() {
       assert.equal(1, callbackTwo.callCount);
     });
 
-    it('should always run global callbacks', function() {
+    it('should always run global callbacks', () => {
       app.registerGlobalAction(callbackOne);
       app.registerAction('foo', callbackTwo);
 
@@ -125,7 +138,7 @@ describe('Orca', function() {
       assert.equal(1, callbackTwo.callCount);
     });
 
-    it('should call higher priority callbacks first', function() {
+    it('should call higher priority callbacks first', () => {
       app.registerGlobalAction(callbackOne, {priority: 10});
       app.registerGlobalAction(callbackTwo, {priority: 20});
 

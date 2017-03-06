@@ -3,6 +3,5 @@ cache: yarn
 node_js:
   - "node"
   - "6"
-  - "5"
 after_success:
   - npm run coveralls

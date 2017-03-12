@@ -1,6 +1,6 @@
 {
   "name": "orcajs",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "main": "./dist/orca.js",
   "license": "MIT",
   "description": "orchestrate your javascript",

@@ -1,4 +1,5 @@
-import _ from 'lodash';
+import {intersection, reverse, cloneDeep, isFunction, isArray, get, set, concat, uniq, forEach} from 'lodash';
+const _ = {intersection, reverse, cloneDeep, isFunction, isArray, get, set, concat, uniq, forEach};
 
 /** Class for organizing javascript callbacks. */
 class Orca {
@@ -67,7 +68,7 @@ class Orca {
 
         let called = namespaces;
 
-        _.each(_.uniq(namespaces), (n) => { this._runNamespace(n, called); });
+        _.forEach(_.uniq(namespaces), (n) => { this._runNamespace(n, called); });
     }
 
     /**

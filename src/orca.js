@@ -32,7 +32,7 @@ class Orca {
      */
     registerAction(namespace, callback, {priority = 0, excludes = []} = {}) {
         // Defend callbacks against foolish behavior
-        if ( namespace.includes(this._entryKey) ) {
+        if ( _.includes(namespace, this._entryKey) ) {
             throw new Error(`Registered namespace matches reserved entryKey: ${this._entryKey}.`);
         } else if ( !_.isFunction(callback) ) {
             throw new TypeError(`Cannot register callback of type: ${typeof callback}`);

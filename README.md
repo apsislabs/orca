@@ -124,3 +124,11 @@ Sometimes sequencing can be important when executing discrete blocks of code. Th
 app.registerGlobalAction(foo, {priority: 0});
 app.registerGlobalAction(bar, {priority: 5});   // this will run before foo
 ```
+
+---
+
+# Built by Apsis
+
+[![apsis](https://s3-us-west-2.amazonaws.com/apsiscdn/apsis.png)](https://www.apsis.io)
+
+`orca` was built by Apsis Labs. We love sharing what we build! Check out our [other libraries on Github](https://github.com/apsislabs), and if you like our work you can [hire us](https://www.apsis.io/work-with-us/) to build your vision.

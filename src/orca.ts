@@ -11,9 +11,19 @@ import reverse from "lodash/reverse";
 import set from "lodash/set";
 import uniq from "lodash/uniq";
 
+interface OrcaOptions {
+  callbacks?: any;
+  globalKey?: string;
+  entryKey?: string;
+}
+
 interface ActionOptions {
   priority?: number;
   excludes?: string | Array<string>;
+}
+
+interface RunOptions {
+  runGlobals?: boolean;
 }
 
 /** Class for organizing javascript callbacks. */
@@ -30,11 +40,11 @@ export class Orca {
    * @param {string} [globalKey=*]       key to use for global callbacks.
    * @param {string} [entryKey=__orca]   key to use for isolating callbacks.
    */
-  constructor(
-    callbacks: object = {},
-    globalKey: string = "*",
-    entryKey: string = "__orca"
-  ) {
+  constructor({
+    callbacks = {},
+    globalKey = "*",
+    entryKey = "__orca"
+  }: OrcaOptions = {}) {
     this._defaultCallbacks = callbacks;
     this._callbacks = callbacks;
     this._globalKey = globalKey;
@@ -68,7 +78,7 @@ export class Orca {
     }
 
     if (!isFunction(callback)) {
-      throw new Error(`Registered callback must be a function.`);
+      throw new TypeError(`Registered callback must be a function.`);
     }
 
     // Get callbacks, return an empty object by default
@@ -104,7 +114,10 @@ export class Orca {
    * @param {string|string[]} [namespaces=[]]     Namespaces to run.
    * @param {boolean}         [runGlobals=true]   Run global callbacks.
    */
-  run(namespaces: string | Array<string> = [], runGlobals: boolean = true) {
+  run(
+    namespaces: string | Array<string> = [],
+    { runGlobals = true }: RunOptions = {}
+  ) {
     if (!isArray(namespaces)) {
       namespaces = [namespaces];
     }

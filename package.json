@@ -8,7 +8,8 @@
   "description": "orchestrate your javascript",
   "scripts": {
     "build": "rollup -c",
-    "watch": "rollup -cw"
+    "watch": "rollup -cw",
+    "test": "mocha -r ts-node/register test/**/*.ts"
   },
   "dependencies": {
     "lodash": "^4.17.11"

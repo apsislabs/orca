@@ -26,8 +26,8 @@ export class Orca {
   /**
    * Instantiate new Orca objcet
    * @constructor
-   * @param {string} [globalKey=*]       key to use for global callbacks.
-   * @param {string} [entryKey=__orca]   key to use for isolating callbacks.
+   * @param {string} [globalKey=*]       Key to use for global callbacks.
+   * @param {string} [entryKey=__orca]   Key to use for isolating callbacks.
    */
   constructor({ globalKey = "*", entryKey = "__orca" }: OrcaOptions = {}) {
     this._defaultCallbacks = {};
@@ -45,10 +45,10 @@ export class Orca {
 
   /**
    * Register an action with the Orca instance
-   * @param {string}          scope       scope to register the callback with.
-   * @param {function}        func        Callback function to register.
+   * @param {string}          scope           Scope to register the callback with.
+   * @param {function}        func            Callback function to register.
    * @param {number}          [priority=0]    Priority for the callback call order.
-   * @param {string|string[]} [excludes=[]]   scopes to exclude this callback.
+   * @param {string|string[]} [excludes=[]]   Scopes to exclude this callback.
    */
   registerAction(
     scope: string,
@@ -93,7 +93,7 @@ export class Orca {
 
   /**
    * Run callbacks for given scopes.
-   * @param {string|string[]} [scopes=[]]     scopes to run.
+   * @param {string|string[]} [scopes=[]]         Scopes to run.
    * @param {boolean}         [runGlobals=true]   Run global callbacks.
    */
   run(
@@ -104,16 +104,16 @@ export class Orca {
     if (runGlobals) called.unshift(this._globalKey);
 
     forEach(uniq(called), n => {
-      this._runscope(n, called);
+      this._runScope(n, called);
     });
   }
 
   /**
    * Run a single scope.
-   * @param {string}      scope   scopes to run.
-   * @param {string[]}    called      All scopes called to run.
+   * @param {string}      scope   Scopes to run.
+   * @param {string[]}    called  All scopes called to run.
    */
-  _runscope(scope: string, called: string[]) {
+  private _runScope(scope: string, called: string[]) {
     let entries = get(this._callbacks, scope, {});
     let scopes: CallbackDefinition[][][] = getValuesDeep(
       entries,

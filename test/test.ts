@@ -34,8 +34,22 @@ describe("Orca", () => {
     let callbacks;
 
     it("should register actions", () => {
+      let key = "foo";
+      app.registerAction(key, callbackOne);
+      callbacks = _.flattenDeep(app._callbacks[key][app._entryKey]);
+      assert.ok(_.some(callbacks, ["func", callbackOne]));
+    });
+
+    it("should register global actions", () => {
       app.registerGlobalAction(callbackOne);
       callbacks = _.flattenDeep(app._callbacks[app._globalKey][app._entryKey]);
+      assert.ok(_.some(callbacks, ["func", callbackOne]));
+    });
+
+    it("should register nested actions", () => {
+      let nestedKey = "foo.bar";
+      app.registerAction(nestedKey, callbackOne);
+      callbacks = _.flattenDeep(app._callbacks["foo"]["bar"][app._entryKey]);
       assert.ok(_.some(callbacks, ["func", callbackOne]));
     });
 
@@ -113,6 +127,17 @@ describe("Orca", () => {
       assert.equal(1, callbackTwo.callCount);
     });
 
+    it("should not run excluded callbacks when running nested scopes", () => {
+      app.registerGlobalAction(callbackOne, { excludes: ["foo.bar"] });
+      app.registerAction("foo.bar", callbackTwo);
+      app.registerAction("foo.bar.baz", callbackTwo);
+
+      app.run("foo.bar");
+
+      assert.equal(0, callbackOne.callCount);
+      assert.equal(2, callbackTwo.callCount);
+    });
+
     it("should allow excludes as a string", () => {
       app.registerGlobalAction(callbackOne, { excludes: "foo" });
       app.run("foo");
@@ -136,6 +161,16 @@ describe("Orca", () => {
       app.run("foo");
 
       assert.equal(1, callbackOne.callCount);
+      assert.equal(1, callbackTwo.callCount);
+    });
+
+    it("should only run the deepest part of a namespace", () => {
+      app.registerAction("foo", callbackOne);
+      app.registerAction("foo.baz", callbackTwo);
+
+      app.run("foo.baz");
+
+      assert.equal(0, callbackOne.callCount);
       assert.equal(1, callbackTwo.callCount);
     });
 

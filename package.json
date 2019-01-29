@@ -28,7 +28,9 @@
       "src/**/*.{ts,tsx}"
     ],
     "reporter": [
-      "text-summary"
+      "text-summary",
+      "html",
+      "lcov"
     ]
   },
   "devDependencies": {

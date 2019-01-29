@@ -2,31 +2,21 @@ import castArray from "lodash/castArray";
 import cloneDeep from "lodash/cloneDeep";
 import concat from "lodash/concat";
 import forEach from "lodash/forEach";
+import forEachRight from "lodash/forEachRight";
 import get from "lodash/get";
 import includes from "lodash/includes";
 import intersection from "lodash/intersection";
-import isArray from "lodash/isArray";
 import isFunction from "lodash/isFunction";
-import reverse from "lodash/reverse";
 import set from "lodash/set";
 import uniq from "lodash/uniq";
 
-interface OrcaOptions {
-  callbacks?: any;
-  globalKey?: string;
-  entryKey?: string;
-}
+import {
+  OrcaOptions,
+  ActionOptions,
+  CallbackDefinition,
+  RunOptions
+} from "./orca.d";
 
-interface ActionOptions {
-  priority?: number;
-  excludes?: string | Array<string>;
-}
-
-interface RunOptions {
-  runGlobals?: boolean;
-}
-
-/** Class for organizing javascript callbacks. */
 export class Orca {
   _defaultCallbacks: object;
   _callbacks: object;
@@ -36,17 +26,12 @@ export class Orca {
   /**
    * Instantiate new Orca objcet
    * @constructor
-   * @param {Object} [callbacks={}]      the default callbacks object.
    * @param {string} [globalKey=*]       key to use for global callbacks.
    * @param {string} [entryKey=__orca]   key to use for isolating callbacks.
    */
-  constructor({
-    callbacks = {},
-    globalKey = "*",
-    entryKey = "__orca"
-  }: OrcaOptions = {}) {
-    this._defaultCallbacks = callbacks;
-    this._callbacks = callbacks;
+  constructor({ globalKey = "*", entryKey = "__orca" }: OrcaOptions = {}) {
+    this._defaultCallbacks = {};
+    this._callbacks = {};
     this._globalKey = globalKey;
     this._entryKey = entryKey;
   }
@@ -61,15 +46,15 @@ export class Orca {
   /**
    * Register an action with the Orca instance
    * @param {string}          namespace       Namespace to register the callback with.
-   * @param {function}        callback        Callback function to register.
+   * @param {function}        func        Callback function to register.
    * @param {number}          [priority=0]    Priority for the callback call order.
    * @param {string|string[]} [excludes=[]]   Namespaces to exclude this callback.
    */
   registerAction(
     namespace: string,
-    callback: () => any,
+    func: () => void,
     { priority = 0, excludes = [] }: ActionOptions = {}
-  ) {
+  ): void {
     // Defend callbacks against foolish behavior
     if (includes(namespace, this._entryKey)) {
       throw new Error(
@@ -77,20 +62,20 @@ export class Orca {
       );
     }
 
-    if (!isFunction(callback)) {
+    if (!isFunction(func)) {
       throw new TypeError(`Registered callback must be a function.`);
     }
 
-    // Get callbacks, return an empty object by default
-    let key = `${namespace}.${this._entryKey}[${priority}]`;
-    let callbacks = get(this._callbacks, key, []);
-    excludes = castArray(excludes);
+    // Cast excludes to an array
+    let excludesArray: string[] = castArray(excludes);
 
-    set(
-      this._callbacks,
-      key,
-      concat(callbacks, { func: callback, excludes: excludes })
-    );
+    // Get callbacks, return an empty object by default
+    let key: string = `${namespace}.${this._entryKey}[${priority}]`;
+    let existingCallbacks: CallbackDefinition[] = get(this._callbacks, key, []);
+    let newCallback: CallbackDefinition = { func, excludes: excludesArray };
+
+    // Set the new callback
+    set(this._callbacks, key, concat(existingCallbacks, newCallback));
   }
 
   /**
@@ -100,13 +85,10 @@ export class Orca {
    * @param {string|string[]} [excludes=[]]   Namespaces to exclude this callback.
    */
   registerGlobalAction(
-    callback: () => any,
+    callback: () => void,
     { priority = 0, excludes = [] }: ActionOptions = {}
-  ) {
-    this.registerAction(this._globalKey, callback, {
-      priority: priority,
-      excludes: excludes
-    });
+  ): void {
+    this.registerAction(this._globalKey, callback, { priority, excludes });
   }
 
   /**
@@ -115,20 +97,13 @@ export class Orca {
    * @param {boolean}         [runGlobals=true]   Run global callbacks.
    */
   run(
-    namespaces: string | Array<string> = [],
+    namespaces: string | string[] = [],
     { runGlobals = true }: RunOptions = {}
-  ) {
-    if (!isArray(namespaces)) {
-      namespaces = [namespaces];
-    }
+  ): void {
+    let called: string[] = castArray(namespaces);
+    if (runGlobals) called.unshift(this._globalKey);
 
-    if (runGlobals) {
-      namespaces.unshift(this._globalKey);
-    }
-
-    let called = namespaces;
-
-    forEach(uniq(namespaces), n => {
+    forEach(uniq(called), n => {
       this._runNamespace(n, called);
     });
   }
@@ -138,20 +113,24 @@ export class Orca {
    * @param {string}      namespace   Namespaces to run.
    * @param {string[]}    called      All namespaces called to run.
    */
-  _runNamespace(namespace: string, called: Array<string>) {
+  _runNamespace(namespace: string, called: string[]) {
     let entries = get(this._callbacks, namespace, {});
-    let namespaces = getValuesDeep(entries, this._entryKey);
+    let namespaces: CallbackDefinition[][][] = getValuesDeep(
+      entries,
+      this._entryKey
+    );
 
-    forEach(namespaces, n => {
-      forEach(reverse(n), priorityLevel => {
-        forEach(priorityLevel, callback => {
+    // Iterate over all namespaces
+    forEach(namespaces, (n: CallbackDefinition[][]) => {
+      forEachRight(n, (priorityLevel: CallbackDefinition[]) => {
+        forEach(priorityLevel, (callback: CallbackDefinition) => {
           let { func, excludes } = callback;
+
           if (intersection(excludes, called).length > 0) {
             return false;
           }
-          if (isFunction(func)) {
-            func();
-          }
+
+          func();
         });
       });
     });
@@ -160,11 +139,11 @@ export class Orca {
 
 /**
  * Deeply search an object for a needle
- * @param  {Array|Object}   haystack    Iterable object to search
+ * @param  {any[]|object}   haystack    Iterable object to search
  * @param  {}               needle      Value or object to search for
  * @return {Array}                      Array of matching values
  */
-function getValuesDeep(haystack: Array<any> | object, needle: any) {
+function getValuesDeep(haystack: any[] | object, needle: any): any[] {
   let results = [];
 
   forEach(haystack, (v: any, k: string | number) => {

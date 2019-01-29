@@ -6,17 +6,13 @@ import pkg from "./package.json";
 export default [
   {
     input: "src/orca.ts",
-    output: {
-      name: "Orca",
-      file: pkg.browser,
-      format: "umd"
-    },
-    plugins: [resolve(), commonjs(), typescript()]
-  },
-  {
-    input: "src/orca.ts",
-    plugins: [typescript()],
+    plugins: [resolve(), commonjs(), typescript()],
     output: [
+      {
+        name: "Orca",
+        file: pkg.browser,
+        format: "umd"
+      },
       { file: pkg.main, format: "cjs" },
       { file: pkg.module, format: "es" }
     ]

@@ -1,2 +1,4 @@
 src/
-.babelrc
+tsconfig.json
+rollup.config.js
+.travis.yml

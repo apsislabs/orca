@@ -144,7 +144,7 @@ describe("Orca", () => {
       assert.equal(0, callbackOne.callCount);
     });
 
-    it("should only run callbacks in namespace", () => {
+    it("should only run callbacks in scope", () => {
       app.registerAction("foo", callbackOne);
       app.registerAction("bar", callbackTwo);
 
@@ -154,7 +154,7 @@ describe("Orca", () => {
       assert.equal(0, callbackTwo.callCount);
     });
 
-    it("should run all nested callbacks in namespace", () => {
+    it("should run all nested callbacks in scope", () => {
       app.registerAction("foo", callbackOne);
       app.registerAction("foo.baz", callbackTwo);
 
@@ -164,7 +164,7 @@ describe("Orca", () => {
       assert.equal(1, callbackTwo.callCount);
     });
 
-    it("should only run the deepest part of a namespace", () => {
+    it("should only run the deepest part of a scope", () => {
       app.registerAction("foo", callbackOne);
       app.registerAction("foo.baz", callbackTwo);
 

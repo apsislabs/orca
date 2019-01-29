@@ -45,20 +45,20 @@ export class Orca {
 
   /**
    * Register an action with the Orca instance
-   * @param {string}          namespace       Namespace to register the callback with.
+   * @param {string}          scope       scope to register the callback with.
    * @param {function}        func        Callback function to register.
    * @param {number}          [priority=0]    Priority for the callback call order.
-   * @param {string|string[]} [excludes=[]]   Namespaces to exclude this callback.
+   * @param {string|string[]} [excludes=[]]   scopes to exclude this callback.
    */
   registerAction(
-    namespace: string,
+    scope: string,
     func: () => void,
     { priority = 0, excludes = [] }: ActionOptions = {}
   ): void {
     // Defend callbacks against foolish behavior
-    if (includes(namespace, this._entryKey)) {
+    if (includes(scope, this._entryKey)) {
       throw new Error(
-        `Registered namespace matches reserved entryKey: ${this._entryKey}.`
+        `Registered scope matches reserved entryKey: ${this._entryKey}.`
       );
     }
 
@@ -70,7 +70,7 @@ export class Orca {
     let excludesArray: string[] = castArray(excludes);
 
     // Get callbacks, return an empty object by default
-    let key: string = `${namespace}.${this._entryKey}[${priority}]`;
+    let key: string = `${scope}.${this._entryKey}[${priority}]`;
     let existingCallbacks: CallbackDefinition[] = get(this._callbacks, key, []);
     let newCallback: CallbackDefinition = { func, excludes: excludesArray };
 
@@ -82,7 +82,7 @@ export class Orca {
    * Shorthand for registering a global callback.
    * @param {function}        callback        Callback function to register.
    * @param {number}          [priority=0]    Priority for the callback call order.
-   * @param {string|string[]} [excludes=[]]   Namespaces to exclude this callback.
+   * @param {string|string[]} [excludes=[]]   scopes to exclude this callback.
    */
   registerGlobalAction(
     callback: () => void,
@@ -92,36 +92,36 @@ export class Orca {
   }
 
   /**
-   * Run callbacks for given namespaces.
-   * @param {string|string[]} [namespaces=[]]     Namespaces to run.
+   * Run callbacks for given scopes.
+   * @param {string|string[]} [scopes=[]]     scopes to run.
    * @param {boolean}         [runGlobals=true]   Run global callbacks.
    */
   run(
-    namespaces: string | string[] = [],
+    scopes: string | string[] = [],
     { runGlobals = true }: RunOptions = {}
   ): void {
-    let called: string[] = castArray(namespaces);
+    let called: string[] = castArray(scopes);
     if (runGlobals) called.unshift(this._globalKey);
 
     forEach(uniq(called), n => {
-      this._runNamespace(n, called);
+      this._runscope(n, called);
     });
   }
 
   /**
-   * Run a single namespace.
-   * @param {string}      namespace   Namespaces to run.
-   * @param {string[]}    called      All namespaces called to run.
+   * Run a single scope.
+   * @param {string}      scope   scopes to run.
+   * @param {string[]}    called      All scopes called to run.
    */
-  _runNamespace(namespace: string, called: string[]) {
-    let entries = get(this._callbacks, namespace, {});
-    let namespaces: CallbackDefinition[][][] = getValuesDeep(
+  _runscope(scope: string, called: string[]) {
+    let entries = get(this._callbacks, scope, {});
+    let scopes: CallbackDefinition[][][] = getValuesDeep(
       entries,
       this._entryKey
     );
 
-    // Iterate over all namespaces
-    forEach(namespaces, (n: CallbackDefinition[][]) => {
+    // Iterate over all scopes
+    forEach(scopes, (n: CallbackDefinition[][]) => {
       forEachRight(n, (priorityLevel: CallbackDefinition[]) => {
         forEach(priorityLevel, (callback: CallbackDefinition) => {
           let { func, excludes } = callback;

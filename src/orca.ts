@@ -140,8 +140,8 @@ export class Orca {
 /**
  * Deeply search an object for a needle
  * @param  {any[]|object}   haystack    Iterable object to search
- * @param  {}               needle      Value or object to search for
- * @return {Array}                      Array of matching values
+ * @param  {any}            needle      Value or object to search for
+ * @return {any[]}                      Array of matching values
  */
 function getValuesDeep(haystack: any[] | object, needle: any): any[] {
   let results = [];

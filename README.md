@@ -52,15 +52,9 @@ If that looks familiar, then `orca` is for you.
 import app from "orcajs";
 
 // Define Callbacks
-function all() {
-  console.log("All");
-}
-function foo() {
-  console.log("Foo");
-}
-function bar() {
-  console.log("Bar");
-}
+const all = () => console.log("All");
+const foo = () => console.log("Foo");
+const bar = () => console.log("Bar");
 
 // Register Actions
 app.registerGlobalAction(all);

@@ -1,7 +1,7 @@
 let assert = require('assert');
 let simple = require('simple-mock');
 let _      = require('lodash');
-let Orca   = require('../src/orca.js').Orca;
+let Orca   = require('../dist/orca.js').Orca;
 
 describe('Orca', () => {
   let app, callbackOne, callbackTwo;
